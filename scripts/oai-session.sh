@@ -2,9 +2,8 @@
 
 PREFIX="/usr/local/etc/oai"
 
-#Cria a sessao tmux remota com os paineis:
+#Create remote session with panes
 sessionStart(){
-
 # Initialize windowns and panes
 ssh -t "$TARGET_USER"@"$TARGET_IP" -p "$TARGET_PORT" \
     "tmux kill-session -t $TARGET_USER-OAI 2>/dev/null; \
@@ -16,8 +15,6 @@ ssh -t "$TARGET_USER"@"$TARGET_IP" -p "$TARGET_PORT" \
      tmux split-window -t $TARGET_USER-OAI:0.2 -v && \
      tmux split-window -t $TARGET_USER-OAI:0.3 -v && \
      tmux select-layout even-vertical "
-
-
 # Deploy OAI core components
 # Pane 0 HSS
 # Pane 1 MME
