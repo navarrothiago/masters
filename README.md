@@ -1,3 +1,3 @@
 # Masters
 
-## [OAI installation](http://localhost:8888/notebooks/notes.ipynb)
+## [OAI installation](https://github.com/navarrothiago/masters/blob/master/notes.ipynb)
