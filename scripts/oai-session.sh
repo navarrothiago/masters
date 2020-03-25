@@ -67,7 +67,7 @@ sessionAttach(){
 sessionStop(){
     ssh -t "$TARGET_USER"@"$TARGET_IP" -p "$TARGET_PORT" \
         "tmux send-keys -t $TARGET_USER-OAI:1.0 \
-             'ps -ef | grep -e \"oai_hss\" | grep -v grep | awk '\''{print \$2}'\'' | xargs -r sudo kill -9; sudo ip addr del 172.16.1.102/24 dev $TARGET_IFACE label $TARGET_IFACE:m11; sudo ip addr del 192.168.247.102/24 dev $TARGET_IFACE label $TARGET_IFACE:m1c; sudo ip addr del 172.55.55.101/24 dev $TARGET_IFACE label $TARGET_IFACE:sxc; sudo ip addr del 172.58.58.102/24 dev $TARGET_IFACE label $TARGET_IFACE:s5c; sudo ip addr del 172.58.58.101/24 dev $TARGET_IFACE label $TARGET_IFACE:p5c; sudo ip addr add 172.16.1.104/24 dev $TARGET_IFACE label $TARGET_IFACE:s11; sudo ip addr del 172.55.55.102/24 dev $TARGET_IFACE label $TARGET_IFACE:sxu; sudo ip addr del 192.168.248.159/24 dev $TARGET_IFACE label $TARGET_IFACE:s1u' C-m $TARGET_PASSWORD C-m"
+             'ps -ef | grep -e \"oai_hss\" | grep -v grep | awk '\''{print \$2}'\'' | xargs -r sudo kill -9; sudo ip addr del 172.16.1.102/24 dev $TARGET_IFACE label $TARGET_IFACE:m11; sudo ip addr del 192.168.247.102/24 dev $TARGET_IFACE label $TARGET_IFACE:m1c; sudo ip addr del 172.55.55.101/24 dev $TARGET_IFACE label $TARGET_IFACE:sxc; sudo ip addr del 172.58.58.102/24 dev $TARGET_IFACE label $TARGET_IFACE:s5c; sudo ip addr del 172.58.58.101/24 dev $TARGET_IFACE label $TARGET_IFACE:p5c; sudo ip addr del 172.16.1.104/24 dev $TARGET_IFACE label $TARGET_IFACE:s11; sudo ip addr del 172.55.55.102/24 dev $TARGET_IFACE label $TARGET_IFACE:sxu; sudo ip addr del 192.168.248.159/24 dev $TARGET_IFACE label $TARGET_IFACE:s1u' C-m $TARGET_PASSWORD C-m"
 }
 
 sessionKill(){
