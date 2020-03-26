@@ -15,6 +15,7 @@
 #=============================================
 
 PREFIX="/usr/local/etc/oai"
+CASSANDRA_SERVER_IP='127.0.0.1'
 
 #Create remote session with panes
 sessionStart(){
@@ -29,10 +30,24 @@ ssh -t "$TARGET_USER"@"$TARGET_IP" -p "$TARGET_PORT" \
      tmux split-window -t $TARGET_USER-OAI:0.2 -v && \
      tmux select-layout even-vertical "
 # Deploy OAI core components
-# Pane 0 HSS
+#
+# Pane 0 
+# - Create logs
+# - Populate table
+# - Run oai_hss
+#
 # Pane 1 MME
+# - Create interfaces
+# - Run run_mme
+#
 # Pane 2 SPGW-C
+# - Create interfaces
+# - Run spgw_c
+#
 # Pane 3 SPGW-U
+#- Create interfaces
+#- Create routes
+#- Run spgw_u
 ssh -t "$TARGET_USER"@"$TARGET_IP" -p "$TARGET_PORT" \
     "tmux send-keys -t $TARGET_USER-OAI:0.0 \
          'cd $PREFIX; \
@@ -40,7 +55,30 @@ ssh -t "$TARGET_USER"@"$TARGET_IP" -p "$TARGET_PORT" \
           sudo touch $PREFIX/logs/hss.log; \
           sudo touch $PREFIX/logs/hss_stat.log; \
           sudo touch $PREFIX/logs/hss_audit.log; \
-          sudo oai_hss -j $PREFIX/hss_rel14.json' C-m $TARGET_PASSWORD C-m &&
+          cd ~/openair-cn/scripts; \
+          cqlsh --file ../src/hss_rel14/db/oai_db.cql $CASSANDRA_SERVER_IP; \
+          ./data_provisioning_users \
+              --apn default.ng4T.com \
+              --apn2 internet \
+              --key fec86ba6eb707ed08905757b1bb44b8f \
+              --imsi-first 208931234561000 \
+              --msisdn-first 001011234561000 \
+              --mme-identity mme.ng4T.com \
+              --no-of-users 20 \
+              --realm ng4T.com \
+              --truncate True  \
+              --verbose True \
+              --cassandra-cluster $CASSANDRA_SERVER_IP; \
+          ./data_provisioning_mme \
+              --id 3 \
+              --mme-identity mme.ng4T.com \
+              --realm ng4T.com \
+              --ue-reachability 1 \
+              --truncate True  \
+              --verbose True \
+              -C $CASSANDRA_SERVER_IP; \
+              cd $PREFIX; \
+              sudo oai_hss -j $PREFIX/hss_rel14.json' C-m $TARGET_PASSWORD C-m &&
      tmux send-keys -t $TARGET_USER-OAI:0.1 \
          'sudo ip addr add 172.16.1.102/24 dev $TARGET_IFACE label $TARGET_IFACE:m11; \
           sudo ip addr add 192.168.247.102/24 dev $TARGET_IFACE label $TARGET_IFACE:m1c; \
@@ -48,7 +86,9 @@ ssh -t "$TARGET_USER"@"$TARGET_IP" -p "$TARGET_PORT" \
      tmux send-keys -t $TARGET_USER-OAI:0.2 \
          'sudo ip addr add 172.55.55.101/24 dev $TARGET_IFACE label $TARGET_IFACE:sxc; \
           sudo ip addr add 172.58.58.102/24 dev $TARGET_IFACE label $TARGET_IFACE:s5c; \
-          sudo ip addr add 172.58.58.101/24 dev $TARGET_IFACE label $TARGET_IFACE:p5c; sudo ip addr add 172.16.1.104/24 dev $TARGET_IFACE label $TARGET_IFACE:s11;  sudo spgwc -c $PREFIX/spgw_c.conf' C-m $TARGET_PASSWORD C-m &&
+          sudo ip addr add 172.58.58.101/24 dev $TARGET_IFACE label $TARGET_IFACE:p5c; \
+          sudo ip addr add 172.16.1.104/24 dev $TARGET_IFACE label $TARGET_IFACE:s11; \
+          sudo spgwc -c $PREFIX/spgw_c.conf' C-m $TARGET_PASSWORD C-m &&
      tmux send-keys -t $TARGET_USER-OAI:0.3 \
          'sudo ip addr add 172.55.55.102/24 dev $TARGET_IFACE label $TARGET_IFACE:sxu; \
           sudo ip addr add 192.168.248.159/24 dev $TARGET_IFACE label $TARGET_IFACE:s1u; \
@@ -60,19 +100,27 @@ ssh -t "$TARGET_USER"@"$TARGET_IP" -p "$TARGET_PORT" \
 
 sessionAttach(){
     ssh -t  "$TARGET_USER"@"$TARGET_IP" -p "$TARGET_PORT" \
-    "tmux select-pane -t $TARGET_USER-OAI:1.0 && \
+    "tmux select-pane -t $TARGET_USER-OAI:0.0 && \
      tmux -2 attach-session -t $TARGET_USER-OAI"
  }
 
 sessionStop(){
     ssh -t "$TARGET_USER"@"$TARGET_IP" -p "$TARGET_PORT" \
         "tmux send-keys -t $TARGET_USER-OAI:1.0 \
-             'ps -ef | grep -e \"oai_hss\" | grep -v grep | awk '\''{print \$2}'\'' | xargs -r sudo kill -9; sudo ip addr del 172.16.1.102/24 dev $TARGET_IFACE label $TARGET_IFACE:m11; sudo ip addr del 192.168.247.102/24 dev $TARGET_IFACE label $TARGET_IFACE:m1c; sudo ip addr del 172.55.55.101/24 dev $TARGET_IFACE label $TARGET_IFACE:sxc; sudo ip addr del 172.58.58.102/24 dev $TARGET_IFACE label $TARGET_IFACE:s5c; sudo ip addr del 172.58.58.101/24 dev $TARGET_IFACE label $TARGET_IFACE:p5c; sudo ip addr del 172.16.1.104/24 dev $TARGET_IFACE label $TARGET_IFACE:s11; sudo ip addr del 172.55.55.102/24 dev $TARGET_IFACE label $TARGET_IFACE:sxu; sudo ip addr del 192.168.248.159/24 dev $TARGET_IFACE label $TARGET_IFACE:s1u' C-m $TARGET_PASSWORD C-m"
+             'ps -ef | grep -e \"oai_hss\" | grep -v grep | awk '\''{print \$2}'\'' | xargs -r sudo kill -9; \
+             sudo ip addr del 172.16.1.102/24 dev $TARGET_IFACE label $TARGET_IFACE:m11; \
+             sudo ip addr del 192.168.247.102/24 dev $TARGET_IFACE label $TARGET_IFACE:m1c; \
+             sudo ip addr del 172.55.55.101/24 dev $TARGET_IFACE label $TARGET_IFACE:sxc; \
+             sudo ip addr del 172.58.58.102/24 dev $TARGET_IFACE label $TARGET_IFACE:s5c; \
+             sudo ip addr del 172.58.58.101/24 dev $TARGET_IFACE label $TARGET_IFACE:p5c; \
+             sudo ip addr del 172.16.1.104/24 dev $TARGET_IFACE label $TARGET_IFACE:s11; \
+             sudo ip addr del 172.55.55.102/24 dev $TARGET_IFACE label $TARGET_IFACE:sxu; \
+             sudo ip addr del 192.168.248.159/24 dev $TARGET_IFACE label $TARGET_IFACE:s1u' C-m $TARGET_PASSWORD C-m"
 }
 
 sessionKill(){
     ssh -t "$TARGET_USER"@"$TARGET_IP" -p "$TARGET_PORT" \
-        "sleep 3; \
+        "sleep 1; \
          tmux kill-session -t $TARGET_USER-OAI 2>/dev/null"
 }
 
