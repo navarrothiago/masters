@@ -80,21 +80,21 @@ ssh -t "$TARGET_USER"@"$TARGET_IP" -p "$TARGET_PORT" \
               cd $PREFIX; \
               sudo oai_hss -j $PREFIX/hss_rel14.json' C-m $TARGET_PASSWORD C-m &&
      tmux send-keys -t $TARGET_USER-OAI:0.1 \
-         'sudo ip addr add 172.16.1.102/24 dev $TARGET_IFACE label $TARGET_IFACE:m11; \
-          sudo ip addr add $TARGET_IP_S10 dev $TARGET_IFACE label $TARGET_IFACE:m10; \
+         'sudo ip addr add 172.16.1.102/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:m11; \
+          sudo ip addr add $TARGET_IP_S10 brd + dev $TARGET_IFACE label $TARGET_IFACE:m10; \
           sudo ~/openair-cn/scripts/run_mme --config-file $PREFIX/mme.conf --set-virt-if' C-m $TARGET_PASSWORD C-m &&
      tmux send-keys -t $TARGET_USER-OAI:0.2 \
-         'sudo ip addr add 172.55.55.101/24 dev $TARGET_IFACE label $TARGET_IFACE:sxc; \
-          sudo ip addr add 172.58.58.102/24 dev $TARGET_IFACE label $TARGET_IFACE:s5c; \
-          sudo ip addr add 172.58.58.101/24 dev $TARGET_IFACE label $TARGET_IFACE:p5c; \
-          sudo ip addr add 172.16.1.104/24 dev $TARGET_IFACE label $TARGET_IFACE:s11; \
+         'sudo ip addr add 172.55.55.101/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:sxc; \
+          sudo ip addr add 172.58.58.102/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:s5c; \
+          sudo ip addr add 172.58.58.101/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:p5c; \
+          sudo ip addr add 172.16.1.104/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:s11; \
           sudo spgwc -c $PREFIX/spgw_c.conf' C-m $TARGET_PASSWORD C-m &&
      tmux send-keys -t $TARGET_USER-OAI:0.3 \
-         'sudo ip addr add 172.55.55.102/24 dev $TARGET_IFACE label $TARGET_IFACE:sxu; \
-          sudo ip addr add $TARGET_IP_S1U dev $TARGET_IFACE label $TARGET_IFACE:s1u; \
+         'sudo ip addr add 172.55.55.102/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:sxu; \
+          sudo ip addr add $TARGET_IP_S1U brd + dev $TARGET_IFACE label $TARGET_IFACE:s1u; \
           LIST=\$(grep -ris lte /etc/iproute2/rt_tables); \
           if [ -z "$LIST" ]; then echo '200 lte' | sudo tee --append /etc/iproute2/rt_tables; else echo "lte table has already created"; fi; \
-          sudo ip r add default via $TARGET_IP_SGI dev $TARGET_IFACE table lte; \
+          sudo ip r add default via $TARGET_IP_SGI dev $TARGET_SGI_IFACE table lte; \
           sudo ip rule add from 12.0.0.0/8 table lte; \
           sudo spgwu -c $PREFIX/spgw_u.conf' C-m $TARGET_PASSWORD C-m"
 }
@@ -109,14 +109,14 @@ sessionStop(){
     ssh -t "$TARGET_USER"@"$TARGET_IP" -p "$TARGET_PORT" \
         "tmux send-keys -t $TARGET_USER-OAI:1.0 \
              'ps -ef | grep -e \"oai_hss\" | grep -v grep | awk '\''{print \$2}'\'' | xargs -r sudo kill -9; \
-             sudo ip addr del 172.16.1.102/24 dev $TARGET_IFACE label $TARGET_IFACE:m11; \
-             sudo ip addr del $TARGET_IP_S10 dev $TARGET_IFACE label $TARGET_IFACE:m10; \
-             sudo ip addr del 172.55.55.101/24 dev $TARGET_IFACE label $TARGET_IFACE:sxc; \
-             sudo ip addr del 172.58.58.102/24 dev $TARGET_IFACE label $TARGET_IFACE:s5c; \
-             sudo ip addr del 172.58.58.101/24 dev $TARGET_IFACE label $TARGET_IFACE:p5c; \
-             sudo ip addr del 172.16.1.104/24 dev $TARGET_IFACE label $TARGET_IFACE:s11; \
-             sudo ip addr del 172.55.55.102/24 dev $TARGET_IFACE label $TARGET_IFACE:sxu; \
-             sudo ip addr del $TARGET_IP_S1U dev $TARGET_IFACE label $TARGET_IFACE:s1u' C-m $TARGET_PASSWORD C-m"
+             sudo ip addr del 172.16.1.102/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:m11; \
+             sudo ip addr del $TARGET_IP_S10 brd + dev $TARGET_IFACE label $TARGET_IFACE:m10; \
+             sudo ip addr del 172.55.55.101/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:sxc; \
+             sudo ip addr del 172.58.58.102/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:s5c; \
+             sudo ip addr del 172.58.58.101/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:p5c; \
+             sudo ip addr del 172.16.1.104/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:s11; \
+             sudo ip addr del 172.55.55.102/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:sxu; \
+             sudo ip addr del $TARGET_IP_S1U brd + dev $TARGET_IFACE label $TARGET_IFACE:s1u' C-m $TARGET_PASSWORD C-m"
 }
 
 sessionKill(){
@@ -126,9 +126,9 @@ sessionKill(){
 }
 
 main(){
-    if [[ $# != 5 ]]; then
-        >&2 echo "Invalid args! ./oai-session.sh <remote_user> <remote_ip> <remote_port> <remote_password> <remote_interface>"
-        >&2 echo "e.g. ./oai-session.sh epc 127.0.0.1 2222 epc ens3"
+    if [[ $# != 6 ]]; then
+        >&2 echo "Invalid args! ./oai-session.sh <remote_user> <remote_ip> <remote_port> <remote_password> <remote_s1c_interface> <remote_sgi_interface>"
+        >&2 echo "e.g. ./oai-session.sh epc 127.0.0.1 2222 epc enp6s0 enp1s0"
         exit 1
     fi
 
@@ -137,6 +137,7 @@ main(){
     TARGET_PORT=$3
     TARGET_PASSWORD=$4
     TARGET_IFACE=$5
+    TARGET_SGI_IFACE=$6
 
     TARGET_IP_S1C=192.168.11.17
     TARGET_IP_S1U=192.168.11.18
