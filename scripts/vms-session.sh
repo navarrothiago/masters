@@ -22,8 +22,9 @@ sessionStart(){
     tmux split-window -t $TMUX_SESSION:0.0 -v 
     tmux split-window -t $TMUX_SESSION:1.0 -v 
     tmux select-layout even-vertical 
-    tmux send-keys -t $TMUX_SESSION:0.0 "virsh --connect qemu:///system start epc; sleep 10; ssh -o ConnectTimeout=10 epc@192.168.11.17 -t " C-m 
-    tmux send-keys -t $TMUX_SESSION:0.1 "virsh --connect qemu:///system start enodeb; sleep 10; ssh -o ConnectTimeout=10 enodeb@192.168.11.15 -t " C-m 
+    tmux send-keys -t $TMUX_SESSION:0.0 "virsh --connect qemu:///system start epc; sleep 10; ssh -o ConnectTimeout=10 epc@$IP_EPC -t " C-m 
+    #tmux send-keys -t $TMUX_SESSION:0.1 "virsh --connect qemu:///system start enodeb; sleep 10; ssh -o ConnectTimeout=10 enodeb@192.168.11.15 -t " C-m 
+    tmux send-keys -t $TMUX_SESSION:0.1 "ssh $HOSTNAME_ENODEB@$IP_ENODEB" C-m 
 }
 
 sessionAttach(){
@@ -42,13 +43,18 @@ sessionKill(){
 }
 
 main(){
-    #if [[ $# != 5 ]]; then
-    #    >&2 echo "TODO!! "
-    #    >&2 echo "e.g. ./oai-session.sh epc 127.0.0.1 2222 epc ens3"
-    #    exit 1
-    #fi
+    if [[ $# != 4 ]]; then
+        >&2 echo "TODO!! "
+        >&2 echo "e.g. ./vms-session epc 127.0.0.1 enodeb 127.0.0.2"
+        exit 1
+    fi
     #echo -n Password:
     #read -s PASSWORD
+    HOSTNAME_EPC=$1
+    IP_EPC=$2
+    HOSTNAME_ENODEB=$3
+    IP_ENODEB=$4
+
     sessionStart
     sessionAttach
     sessionStop
