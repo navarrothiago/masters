@@ -56,23 +56,58 @@ ssh -t "$TARGET_USER"@"$TARGET_IP" -p "$TARGET_PORT" \
           sudo touch $PREFIX/logs/hss_stat.log; \
           sudo touch $PREFIX/logs/hss_audit.log; \
           cd ~/openair-cn/scripts; \
-          cqlsh --file ../src/hss_rel14/db/oai_db.cql $CASSANDRA_SERVER_IP; \
           ./data_provisioning_users \
-              --apn default.ng4T.com \
+              --apn oai.ipv4 \
               --apn2 internet \
-              --key fec86ba6eb707ed08905757b1bb44b8f \
-              --imsi-first 208931234561000 \
-              --msisdn-first 001011234561000 \
-              --mme-identity mme.ng4T.com \
-              --no-of-users 20 \
-              --realm ng4T.com \
-              --truncate True  \
+              --key BA6C4204C5F5F77726C0B43431C92EEF \
+              --imsi-first 724990000001046 \
+              --msisdn-first 15126389698 \
+              --mme-identity mme.openairinterface.org \
+              --no-of-users 1 \
+              --realm openairinterface.org \
+              --truncate False  \
+              --verbose True \
+              --cassandra-cluster $CASSANDRA_SERVER_IP; \
+          ./data_provisioning_users \
+              --apn oai.ipv4 \
+              --apn2 internet \
+              --key 92127CD2BA85A9FB0079BB3EC8453AF2 \
+              --imsi-first 724990000001047 \
+              --msisdn-first 15126389698 \
+              --mme-identity mme.openairinterface.org \
+              --no-of-users 1 \
+              --realm openairinterface.org \
+              --truncate False  \
+              --verbose True \
+              --cassandra-cluster $CASSANDRA_SERVER_IP; \
+          ./data_provisioning_users \
+              --apn oai.ipv4 True
+              --apn2 internet \
+              --key 53C21A405FB6E86A15539B2B76D078F8 \
+              --imsi-first 724990000001048 \
+              --msisdn-first 15126389698 \
+              --mme-identity mme.openairinterface.org \
+              --no-of-users 1 \
+              --realm openairinterface.org \
+              --truncate False  \
+              --verbose True \
+              --cassandra-cluster $CASSANDRA_SERVER_IP; \
+          ./data_provisioning_users \
+              --apn oai.ipv4 \
+              --apn2 internet \
+              --key D4AA9FD8F87EED5D95D8D61871B20A7B \
+              --imsi-first 724990000001049 \
+              --msisdn-first 15126389698 \
+              --mme-identity mme.openairinterface.org \
+              --no-of-users 1 \
+              --realm openairinterface.org \
+              --truncate False  \
               --verbose True \
               --cassandra-cluster $CASSANDRA_SERVER_IP; \
           ./data_provisioning_mme \
               --id 3 \
-              --mme-identity mme.ng4T.com \
-              --realm ng4T.com \
+              --mme-identity mme.openairinterface.org \
+              --realm openairinterface.org \
               --ue-reachability 1 \
               --truncate True  \
               --verbose True \
@@ -80,17 +115,20 @@ ssh -t "$TARGET_USER"@"$TARGET_IP" -p "$TARGET_PORT" \
               cd $PREFIX; \
               sudo oai_hss -j $PREFIX/hss_rel14.json' C-m $TARGET_PASSWORD C-m &&
      tmux send-keys -t $TARGET_USER-OAI:0.1 \
-         'sudo ip addr add 172.16.1.102/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:m11; \
+         'sleep 1; \
+          sudo ip addr add 172.16.1.102/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:m11; \
           sudo ip addr add $TARGET_IP_S10 brd + dev $TARGET_IFACE label $TARGET_IFACE:m10; \
           sudo ~/openair-cn/scripts/run_mme --config-file $PREFIX/mme.conf --set-virt-if' C-m $TARGET_PASSWORD C-m &&
      tmux send-keys -t $TARGET_USER-OAI:0.2 \
-         'sudo ip addr add 172.55.55.101/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:sxc; \
+         'sleep 1; \
+          sudo ip addr add 172.55.55.101/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:sxc; \
           sudo ip addr add 172.58.58.102/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:s5c; \
           sudo ip addr add 172.58.58.101/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:p5c; \
           sudo ip addr add 172.16.1.104/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:s11; \
           sudo spgwc -c $PREFIX/spgw_c.conf' C-m $TARGET_PASSWORD C-m &&
      tmux send-keys -t $TARGET_USER-OAI:0.3 \
-         'sudo ip addr add 172.55.55.102/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:sxu; \
+         'sleep 1; \
+          sudo ip addr add 172.55.55.102/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:sxu; \
           sudo ip addr add $TARGET_IP_S1U brd + dev $TARGET_IFACE label $TARGET_IFACE:s1u; \
           LIST=\$(grep -ris lte /etc/iproute2/rt_tables); \
           if [ -z "$LIST" ]; then echo '200 lte' | sudo tee --append /etc/iproute2/rt_tables; else echo "lte table has already created"; fi; \
@@ -142,7 +180,7 @@ main(){
     TARGET_IP_S1C=192.168.11.17
     TARGET_IP_S1U=192.168.11.18
     TARGET_IP_S10=192.168.11.19
-    TARGET_IP_SGI=10.50.11.133
+    TARGET_IP_SGI=10.50.11.224
     
     sessionStart
     sessionAttach
