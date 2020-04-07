@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<TextAnalysisTool.NET version="2018-11-20" showOnlyFilteredLines="False">
+  <filters>
+    <filter enabled="y" excluding="n" description="" foreColor="008000" backColor="000000" type="matches_text" case_sensitive="n" regex="n" text="DEBUG" />
+    <filter enabled="y" excluding="n" description="" foreColor="00ffff" backColor="000000" type="matches_text" case_sensitive="n" regex="n" text="INFO" />
+    <filter enabled="y" excluding="n" description="" foreColor="ffffff" backColor="000000" type="matches_text" case_sensitive="n" regex="n" text="TRACE" />
+    <filter enabled="y" excluding="n" description="" foreColor="ff0000" backColor="000000" type="matches_text" case_sensitive="n" regex="n" text="ERROR" />
+    <filter enabled="y" excluding="n" description="" foreColor="6495ed" backColor="000000" type="matches_text" case_sensitive="n" regex="n" text="NOTIC" />
+    <filter enabled="y" excluding="n" description="" foreColor="ffff00" backColor="000000" type="matches_text" case_sensitive="n" regex="n" text="WARNI" />
+    <filter enabled="y" excluding="n" description="" backColor="ff0000" type="matches_text" case_sensitive="n" regex="n" text="CRITI" />
+  </filters>
+</TextAnalysisTool.NET>
