@@ -167,7 +167,7 @@ sessionStart(){
               sudo ip addr add 172.58.58.102/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:s5c; \
               sudo ip addr add 172.58.58.101/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:p5c; \
               sudo ip addr add 172.16.1.104/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:s11; \
-              sudo spgwc -c $PREFIX/spgw_c.conf 2>&1 | tee ~/logs/spgwc.log' C-m $TARGET_PASSWORD C-m &&
+              sudo -E spgwc -c $PREFIX/spgw_c.conf 2>&1 | tee ~/logs/spgwc.log' C-m $TARGET_PASSWORD C-m &&
          tmux send-keys -t $TARGET_USER-OAI:0.3 \
              'sleep 2; \
               sudo ip addr add 172.55.55.102/24 brd + dev $TARGET_IFACE label $TARGET_IFACE:sxu; \
@@ -176,7 +176,7 @@ sessionStart(){
               if [ -z "$LIST" ]; then echo '200 lte' | sudo tee --append /etc/iproute2/rt_tables; else echo "lte table has already created"; fi; \
               sudo ip r add default via $TARGET_IP_SGI dev $TARGET_SGI_IFACE table lte; \
               sudo ip rule add from 12.0.0.0/8 table lte; \
-              sudo spgwu -c $PREFIX/spgw_u.conf 2>&1 | tee ~/logs/spgwu.log' C-m $TARGET_PASSWORD C-m"
+              sudo -E spgwu -c $PREFIX/spgw_u.conf 2>&1 | tee ~/logs/spgwu.log' C-m $TARGET_PASSWORD C-m"
 
 }
 
@@ -220,7 +220,6 @@ main(){
     TARGET_IFACE=$5
     TARGET_SGI_IFACE=$6
 
-    TARGET_IP_S1C=192.168.11.17
     TARGET_IP_S1U=192.168.11.18
     TARGET_IP_S10=192.168.11.19
     TARGET_IP_SGI=10.50.11.227

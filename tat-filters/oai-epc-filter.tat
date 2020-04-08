@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <TextAnalysisTool.NET version="2018-11-20" showOnlyFilteredLines="False">
   <filters>
+    <filter enabled="y" excluding="n" description="" backColor="ffb6c1" type="matches_text" case_sensitive="n" regex="n" text="attach " />
     <filter enabled="y" excluding="n" description="" foreColor="008000" backColor="000000" type="matches_text" case_sensitive="n" regex="n" text="DEBUG" />
     <filter enabled="y" excluding="n" description="" foreColor="00ffff" backColor="000000" type="matches_text" case_sensitive="n" regex="n" text="INFO" />
     <filter enabled="y" excluding="n" description="" foreColor="ffffff" backColor="000000" type="matches_text" case_sensitive="n" regex="n" text="TRACE" />
