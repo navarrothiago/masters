@@ -1,4 +1,5 @@
 # Masters
 
 # :construction: WORK IN PROGRESS :bangbang:  
-## [OAI installation](https://github.com/navarrothiago/masters/blob/master/notes.ipynb)
+
+See [wiki](https://github.com/navarrothiago/masters/wiki) to find OpenAirInterface full deployment.
